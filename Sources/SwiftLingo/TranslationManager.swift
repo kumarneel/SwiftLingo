@@ -9,20 +9,25 @@ import Foundation
 
 protocol TranslationManagerProtocol {
     func openFile()
-    func createNewLanguageFile()
+    func createLanguageFiles(localizationData: [String: String])
 }
 
 final class TranslationManager: TranslationManagerProtocol {
     
     private let fileManager = FileManager.default
     private let fileReader = FileReader()
+    private let translater = Translater()
+        
+    private let localizationFilePath: String
+    // TODO: Automate these variables
+    private let primaryLanguage = "en"
+    private let desiredLangaugeCodes = ["en", "de", "fr", "es"]
+    
+    init(localizationFilePath: String) {
+        self.localizationFilePath = localizationFilePath
+    }
 
     func openFile() {
-        // TODO: open local level localization file
-        let localizationFilePath = "/Users/photos/Desktop/MB/Mood Bubble/Mood Bubble/Localization/en.lproj/Localizable.strings"
-        
-        // TODO: add what languages you need
-        // let langugePath = directory.appendingPathComponent("\(langCode).lproj")
         
         do {
             if !fileManager.fileExists(atPath: localizationFilePath) {
@@ -31,14 +36,55 @@ final class TranslationManager: TranslationManagerProtocol {
                 let fileContents = try String(contentsOfFile: localizationFilePath, encoding: .utf8)
                 // go through contents and create an array of files
                 let dictionary = fileReader.mapOutputToReadableDictionary(input: fileContents)
-                print("dictionary: ", dictionary)
+                createLanguageFiles(localizationData: dictionary)
             }
         } catch let error {
             print("[ERROR]: ", error)
         }
     }
     
-    func createNewLanguageFile() {
+    func createLanguageFiles(localizationData: [String: String]) {
+        // TODO: add what languages you need
+        // let langugePath = directory.appendingPathComponent("\(langCode).lproj")
         
+        for desiredLangaugeCode in desiredLangaugeCodes {
+            
+            // see if we are on the primary selected language
+            if desiredLangaugeCode == primaryLanguage {
+                continue
+            }
+            
+            let writeText = translater.generateNewLanguageFileString(primaryLanguageData: localizationData, languageCode: desiredLangaugeCode)
+            
+            print("[CODE: \(desiredLangaugeCode)]: \n", writeText)
+            writeToFile(writeText: writeText, langCode: desiredLangaugeCode)
+        }
+    }
+    
+    private func writeToFile(writeText: String,
+                             langCode: String) {
+
+        let fileManager = FileManager.default
+        // TODO: automate this file
+        let directory = URL(fileURLWithPath: "/Users/photos/Desktop/Localization/TestLocal/TestLocal/Local/")
+        let langugePath = directory.appendingPathComponent("\(langCode).lproj")
+        let filePath = langugePath.appendingPathComponent("Localizable2.strings")
+        do {
+            if !fileManager.fileExists(atPath: langugePath.path) {
+                // throw large fatal error, file does not exist for code
+                fatalError("[SL ERROR]: Langauge code [\(langCode)] not found")
+            }
+            try writeText.write(to: filePath, atomically: true, encoding: String.Encoding.utf8)
+            print("[LOG]: ", "wrote to file - ", langCode)
+        } catch let error {
+            print("[ERROR]: ", error)
+        }
     }
 }
+
+
+/*
+ Nice to haves
+ - automatically find the localization setup in project
+ - only localize once the user is done, and ready to deploy
+ */

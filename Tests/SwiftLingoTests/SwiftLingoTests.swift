@@ -3,7 +3,6 @@ import XCTest
 
 final class SwiftLingoTests: XCTestCase {
     func testTranslationManager() {
-        let translationManger = TranslationManager()
-        translationManger.openFile()
+        SwiftLingo.shared.initialize()
     }
 }
