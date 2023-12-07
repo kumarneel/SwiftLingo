@@ -98,4 +98,6 @@ final class TranslationManager: TranslationManagerProtocol {
  - automatically find the localization setup in project
  - only localize once the user is done, and ready to deploy
  - keep marked sections
+ - automcatically generate the localizable strings file
+ - manually prevent swift keywords from being created (compiler will yell at you if not)
  */
