@@ -37,6 +37,7 @@ final class TranslationManager: TranslationManagerProtocol {
                 // go through contents and create an array of files
                 let dictionary = fileReader.mapOutputToReadableDictionary(input: fileContents)
                 createLanguageFiles(localizationData: dictionary)
+                generateStringsVariables(primaryLanguageData: dictionary)
             }
         } catch let error {
             print("[ERROR]: ", error)
@@ -63,7 +64,8 @@ final class TranslationManager: TranslationManagerProtocol {
     
     private func writeToFile(writeText: String,
                              langCode: String) {
-
+        
+        // TODO: abstract this file write function
         let fileManager = FileManager.default
         // TODO: automate this file
         let directory = URL(fileURLWithPath: "/Users/photos/Desktop/Localization/TestLocal/TestLocal/Local/")
@@ -80,6 +82,14 @@ final class TranslationManager: TranslationManagerProtocol {
             print("[ERROR]: ", error)
         }
     }
+    
+    private func generateStringsVariables(primaryLanguageData: [String: String]) {
+        let stringsVariableGenerator = StringsVariableGenerator(
+            localizationDirectoryPath: "/Users/photos/Desktop/Localization/TestLocal/TestLocal/Local/",
+            primaryLanguageData: primaryLanguageData
+        )
+        stringsVariableGenerator.generate()
+    }
 }
 
 
@@ -87,4 +97,5 @@ final class TranslationManager: TranslationManagerProtocol {
  Nice to haves
  - automatically find the localization setup in project
  - only localize once the user is done, and ready to deploy
+ - keep marked sections
  */
