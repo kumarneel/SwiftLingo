@@ -33,11 +33,12 @@ final class StringsVariableGenerator: StringsVariableGeneratorProtocol {
         do {
             if !fileManager.fileExists(atPath: filePath.path) {
                 // throw large fatal error, file does not exist for code
-                fatalError("[SL ERROR]: Failed to make LocalizableStrings.swift file")
+                fileManager.createFile(atPath: filePath.path, contents: nil, attributes: nil)
             }
             try writeText.write(to: filePath, atomically: true, encoding: String.Encoding.utf8)
+            print("[SL LOG]: successfully generated new LocalizableStrings")
         } catch let error {
-            print("[ERROR]: ", error)
+            print("[SL ERROR]: ", error)
         }
     }
     
@@ -54,7 +55,7 @@ final class StringsVariableGenerator: StringsVariableGeneratorProtocol {
         """
         
         for key in primaryLanguageData.keys {
-            swiftCodeToWrite += "\tstatic let \(key) = NSLocalizedString(\"\(key)\", comment: \"insert comment\")\n"
+            swiftCodeToWrite += "\tstatic let \(key) = NSLocalizedString(\"\(key)\", comment: \"Localizable\")\n"
         }
         
         swiftCodeToWrite += "\n}"
