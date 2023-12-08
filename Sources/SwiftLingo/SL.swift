@@ -7,10 +7,8 @@
 
 import Foundation
 
-public final class SL {
-    static let shared = SL()
-    
-    func initialize(directoryPath: String, desiredLanguages: [String]) {
+public final class SL {    
+    public static func initialize(directoryPath: String, desiredLanguages: [String]) {
         let translationManager = TranslationManager(
             directoryPath: directoryPath,
             desiredLangaugeCodes: desiredLanguages
