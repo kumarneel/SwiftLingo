@@ -3,6 +3,9 @@ import XCTest
 
 final class SwiftLingoTests: XCTestCase {
     func testInitialize() {
-        SwiftLingo.shared.initialize()
+        SwiftLingo.shared.initialize(
+            directoryPath: "/Users/photos/Desktop/Localization/TestLocal/TestLocal/Local",
+            desiredLanguages: ["en", "es", "fr", "de"]
+        )
     }
 }

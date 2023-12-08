@@ -7,11 +7,11 @@
 
 import Foundation
 
-protocol StringsVariableGeneratorProtocol {
+internal protocol StringsVariableGeneratorProtocol {
     func generate()
 }
 
-final class StringsVariableGenerator: StringsVariableGeneratorProtocol {
+internal final class StringsVariableGenerator: StringsVariableGeneratorProtocol {
     
     let localizationDirectoryPath: String
     let primaryLanguageData: [String: String]

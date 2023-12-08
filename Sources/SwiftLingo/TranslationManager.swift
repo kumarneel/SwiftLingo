@@ -7,57 +7,55 @@
 
 import Foundation
 
-protocol TranslationManagerProtocol {
+internal protocol TranslationManagerProtocol {
     func openFile()
     func createLanguageFiles(localizationData: [String: String])
 }
 
-final class TranslationManager: TranslationManagerProtocol {
+internal final class TranslationManager: TranslationManagerProtocol {
     
     private let fileManager = FileManager.default
     private let fileReader = FileReader()
     private let translater = Translater()
         
-    private let localizationFilePath: String
+    private let directoryPath: String
     // TODO: Automate these variables
     private let primaryLanguage = "en"
     private let desiredLangaugeCodes = ["en", "de", "fr", "es"]
     
-    init(localizationFilePath: String) {
-        self.localizationFilePath = localizationFilePath
+    init(directoryPath: String) {
+        self.directoryPath = directoryPath
     }
 
     func openFile() {
+        let desiredLanguage = "en"
+        let pathWithDesiredLanguage = directoryPath + "/\(desiredLanguage).lproj/Localizable.strings"
         
         do {
-            if !fileManager.fileExists(atPath: localizationFilePath) {
-                // file doesn't exist
+            if !fileManager.fileExists(atPath: pathWithDesiredLanguage) {
+                fatalError("[SL ERROR]: Localization File does not exist")
             } else {
-                let fileContents = try String(contentsOfFile: localizationFilePath, encoding: .utf8)
+                let fileContents = try String(contentsOfFile: pathWithDesiredLanguage, encoding: .utf8)
                 // go through contents and create an array of files
                 let dictionary = fileReader.mapOutputToReadableDictionary(input: fileContents)
                 createLanguageFiles(localizationData: dictionary)
                 generateStringsVariables(primaryLanguageData: dictionary)
             }
         } catch let error {
-            print("[ERROR]: ", error)
+            print("ERROR: ", error)
         }
     }
     
     func createLanguageFiles(localizationData: [String: String]) {
-        // TODO: add what languages you need
-        // let langugePath = directory.appendingPathComponent("\(langCode).lproj")
-        
         for desiredLangaugeCode in desiredLangaugeCodes {
             
-            // see if we are on the primary selected language
+            // we are on the primary selected language, skip
             if desiredLangaugeCode == primaryLanguage {
                 continue
             }
             
             let writeText = translater.generateNewLanguageFileString(primaryLanguageData: localizationData, languageCode: desiredLangaugeCode)
             
-            print("[CODE: \(desiredLangaugeCode)]: \n", writeText)
             writeToFile(writeText: writeText, langCode: desiredLangaugeCode)
         }
     }
@@ -67,25 +65,26 @@ final class TranslationManager: TranslationManagerProtocol {
         
         // TODO: abstract this file write function
         let fileManager = FileManager.default
-        // TODO: automate this file
-        let directory = URL(fileURLWithPath: "/Users/photos/Desktop/Localization/TestLocal/TestLocal/Local/")
+
+        let directory = URL(fileURLWithPath: directoryPath)
         let langugePath = directory.appendingPathComponent("\(langCode).lproj")
-        let filePath = langugePath.appendingPathComponent("Localizable2.strings")
+        let filePath = langugePath.appendingPathComponent("Localizable.strings")
+        
         do {
             if !fileManager.fileExists(atPath: langugePath.path) {
                 // throw large fatal error, file does not exist for code
                 fatalError("[SL ERROR]: Langauge code [\(langCode)] not found")
             }
             try writeText.write(to: filePath, atomically: true, encoding: String.Encoding.utf8)
-            print("[LOG]: ", "wrote to file - ", langCode)
+            print("[SL LOG]: ", "wrote to file - ", langCode)
         } catch let error {
-            print("[ERROR]: ", error)
+            print("[SL ERROR]: ", error)
         }
     }
     
     private func generateStringsVariables(primaryLanguageData: [String: String]) {
         let stringsVariableGenerator = StringsVariableGenerator(
-            localizationDirectoryPath: "/Users/photos/Desktop/Localization/TestLocal/TestLocal/Local/",
+            localizationDirectoryPath: directoryPath,
             primaryLanguageData: primaryLanguageData
         )
         stringsVariableGenerator.generate()
@@ -100,4 +99,5 @@ final class TranslationManager: TranslationManagerProtocol {
  - keep marked sections
  - automcatically generate the localizable strings file
  - manually prevent swift keywords from being created (compiler will yell at you if not)
- */
+ - language not found fatal error
+*/

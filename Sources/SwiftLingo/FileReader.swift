@@ -7,11 +7,11 @@
 
 import Foundation
 
-protocol FilerReaderProtocol {
+internal protocol FilerReaderProtocol {
     func mapOutputToReadableDictionary(input: String) -> [String: String]
 }
 
-class FileReader: FilerReaderProtocol {
+internal class FileReader: FilerReaderProtocol {
     
     // Regular expression pattern to match key-value pairs
     private let pattern = "\"([^\"]+)\"\\s*=\\s*\"([^\"]+)\";"

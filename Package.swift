@@ -19,5 +19,5 @@ let package = Package(
         .testTarget(
             name: "SwiftLingoTests",
             dependencies: ["SwiftLingo"]),
-    ],
+    ]
 )
