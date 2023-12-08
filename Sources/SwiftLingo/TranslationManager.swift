@@ -8,8 +8,9 @@
 import Foundation
 
 internal protocol TranslationManagerProtocol {
-    func openFile()
-    func createLanguageFiles(localizationData: [String: String])
+    func openFile(completion: @escaping(_ primaryLanguageData: [String: String]) -> Void)
+    func createLanguageFiles(localizationData: [String: String], completion: @escaping(_ languageStringMaps: [String: String]) -> Void)
+    func generateStringsVariables(primaryLanguageData: [String: String])
 }
 
 internal final class TranslationManager: TranslationManagerProtocol {
@@ -21,13 +22,14 @@ internal final class TranslationManager: TranslationManagerProtocol {
     private let directoryPath: String
     // TODO: Automate these variables
     private let primaryLanguage = "en"
-    private let desiredLangaugeCodes = ["en", "de", "fr", "es"]
+    private let desiredLangaugeCodes: [String]
     
-    init(directoryPath: String) {
+    init(directoryPath: String, desiredLangaugeCodes: [String]) {
         self.directoryPath = directoryPath
+        self.desiredLangaugeCodes = desiredLangaugeCodes
     }
 
-    func openFile() {
+    func openFile(completion: @escaping(_ primaryLanguageData: [String: String]) -> Void) {
         let desiredLanguage = "en"
         let pathWithDesiredLanguage = directoryPath + "/\(desiredLanguage).lproj/Localizable.strings"
         
@@ -38,29 +40,35 @@ internal final class TranslationManager: TranslationManagerProtocol {
                 let fileContents = try String(contentsOfFile: pathWithDesiredLanguage, encoding: .utf8)
                 // go through contents and create an array of files
                 let dictionary = fileReader.mapOutputToReadableDictionary(input: fileContents)
-                createLanguageFiles(localizationData: dictionary)
-                generateStringsVariables(primaryLanguageData: dictionary)
+                completion(dictionary)
+               
             }
         } catch let error {
             print("ERROR: ", error)
         }
     }
     
-    func createLanguageFiles(localizationData: [String: String]) {
+    func createLanguageFiles(localizationData: [String: String], completion: @escaping(_ languageStringMaps: [String: String]) -> Void) {
+        
+        var fileStringMap = ["":""]
         for desiredLangaugeCode in desiredLangaugeCodes {
             
             // we are on the primary selected language, skip
             if desiredLangaugeCode == primaryLanguage {
                 continue
             }
-            
-            let writeText = translater.generateNewLanguageFileString(primaryLanguageData: localizationData, languageCode: desiredLangaugeCode)
-            
-            writeToFile(writeText: writeText, langCode: desiredLangaugeCode)
+            print("language code: ", desiredLangaugeCodes)
+            translater.generateNewLanguageFileString(primaryLanguageData: localizationData, languageCode: desiredLangaugeCode) { fileString in
+                fileStringMap[desiredLangaugeCode] = fileString
+                self.writeToFile(writeText: fileString, langCode: desiredLangaugeCode)
+                if fileStringMap.count == self.desiredLangaugeCodes.count {
+                    completion(fileStringMap)
+                }
+            }
         }
     }
     
-    private func writeToFile(writeText: String,
+    internal func writeToFile(writeText: String,
                              langCode: String) {
         
         // TODO: abstract this file write function
@@ -82,7 +90,7 @@ internal final class TranslationManager: TranslationManagerProtocol {
         }
     }
     
-    private func generateStringsVariables(primaryLanguageData: [String: String]) {
+    internal func generateStringsVariables(primaryLanguageData: [String: String]) {
         let stringsVariableGenerator = StringsVariableGenerator(
             localizationDirectoryPath: directoryPath,
             primaryLanguageData: primaryLanguageData

@@ -14,7 +14,11 @@ class API {
         case invalidResponse
     }
 
-    static func makeAPIRequest(_ primaryLanguageData: [String: String], _ languageCode: String) -> String {
+    func makeAPIRequest(
+        _ primaryLanguageData: [String: String],
+        _ languageCode: String,
+        completion: @escaping(_ data: [String: String]) -> Void
+    ){
 
         // Set the API endpoint URL
         let apiUrl = URL(string: "https://api.openai.com/v1/chat/completions")!
@@ -41,6 +45,8 @@ class API {
         let jsonData = try! JSONSerialization.data(withJSONObject: requestBody)
         request.httpBody = jsonData
         
+        var translatedData = ["":""]
+        
         // Make the API request
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             // Handle the response here
@@ -48,13 +54,28 @@ class API {
                 print("Error: \(error)")
             } else if let data = data {
                 // Process the response data
-                let responseString = String(data: data, encoding: .utf8)
-                print("Response: \(responseString ?? "")")
+                do {
+                    if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                        if let message = (json["choices"] as? [[String: Any]])?.first?["message"] as? [String: Any],
+                           let contentDict = message["content"] as? String {
+                            translatedData = try self.convertToDictionary(contentDict)
+                            completion(translatedData)
+                        }
+                    }
+                } catch {
+                    completion(["":""])
+                }
             }
         }
 
         task.resume()
-        return ""
+    }
+    
+    private func convertToDictionary(_ text: String) throws -> [String: String] {
+        guard let data = text.data(using: .utf8) else { return [:] }
+        let anyResult: Any = try JSONSerialization.jsonObject(with: data, options: [])
+        return anyResult as? [String: String] ?? [:]
     }
 }
+
 
