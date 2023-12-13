@@ -9,10 +9,6 @@ import Foundation
 
 
 class API {
-    enum APIError: Error {
-        case requestFailed
-        case invalidResponse
-    }
 
     func makeAPIRequest(
         _ primaryLanguageData: [String: String],

@@ -20,7 +20,6 @@ internal final class TranslationManager: TranslationManagerProtocol {
     private let translater = Translater()
         
     private let directoryPath: String
-    // TODO: Automate these variables
     private let primaryLanguage = "en"
     private let desiredLangaugeCodes: [String]
     
@@ -57,7 +56,6 @@ internal final class TranslationManager: TranslationManagerProtocol {
             if desiredLangaugeCode == primaryLanguage {
                 continue
             }
-            print("language code: ", desiredLangaugeCodes)
             translater.generateNewLanguageFileString(primaryLanguageData: localizationData, languageCode: desiredLangaugeCode) { fileString in
                 fileStringMap[desiredLangaugeCode] = fileString
                 self.writeToFile(writeText: fileString, langCode: desiredLangaugeCode)

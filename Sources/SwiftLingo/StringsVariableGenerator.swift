@@ -25,7 +25,7 @@ internal final class StringsVariableGenerator: StringsVariableGeneratorProtocol 
     
     // auto generate the localizable file
     func generate() {
-        let directory = URL(fileURLWithPath: "/Users/photos/Desktop/Localization/TestLocal/TestLocal/Local/")
+        let directory = URL(fileURLWithPath: localizationDirectoryPath)
         let filePath = directory.appendingPathComponent("LocalizableStrings.swift")
         
         let writeText = generateNewVariablesFileString()
