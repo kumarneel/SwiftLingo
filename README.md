@@ -27,3 +27,40 @@ Localization is time-consuming so I made a package to automate the task.
 
 7. They will now appear under the file you have created
 <img width="274" alt="Screenshot 2023-12-15 at 1 23 40 PM" src="https://github.com/kumarneel/SwiftLingo/assets/19336901/e679be35-045e-411c-adb0-feacb35fed2f">
+
+## Usage
+
+### Create your first key in your English Translation file
+```
+"log_in_title" = "Login";
+```
+
+### Import SwiftLingo
+### Initialize in AppDelegate or anywhere AND RUN ON SIMULATOR
+```
+// Path to root directory where files are stored
+// 'fr' is the French Language Code
+SL.initialize(
+    directoryPath: "/Users/photos/Desktop/Localization/SwiftLingoTest/SwiftLingoTest/Localization",
+    desiredLanguages: ["en", fr"]
+)
+```
+### Watch as files auto-populate once logs are complete
+
+![Screenshot 2023-12-15 at 3 11 55 PM](https://github.com/kumarneel/SwiftLingo/assets/19336901/9388446c-ce00-46f5-aaa5-cb1a4dbc2319)
+
+### Use localized string variable in View
+
+```
+struct ContentView: View {
+    var body: some View {
+        VStack {
+            Text(LocalizableStrings.log_in_title)
+        }
+        .padding()
+    }
+}
+```
+
+
+
