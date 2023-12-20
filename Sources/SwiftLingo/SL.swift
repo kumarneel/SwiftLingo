@@ -8,7 +8,7 @@
 import Foundation
 
 public final class SL {    
-    public static func initialize(directoryPath: String, desiredLanguages: [String]) {
+    public static func initialize(directoryPath: String, desiredLanguages: [String], disableLocalization: Bool = false) {
         let translationManager = TranslationManager(
             directoryPath: directoryPath,
             desiredLangaugeCodes: desiredLanguages
@@ -16,9 +16,12 @@ public final class SL {
         
         translationManager.openFile { primaryLanguageData in
             translationManager.generateStringsVariables(primaryLanguageData: primaryLanguageData)
-            translationManager.createLanguageFiles(localizationData: primaryLanguageData) { languageStringMaps in
-                print("[SL LOG] Localization complete")
+            if !disableLocalization {
+                translationManager.createLanguageFiles(localizationData: primaryLanguageData) { languageStringMaps in
+                    print("[SL LOG] Localization complete")
+                }
             }
+            
         }
     }
     
