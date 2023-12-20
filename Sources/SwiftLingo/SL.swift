@@ -8,7 +8,12 @@
 import Foundation
 
 public final class SL {    
-    public static func initialize(directoryPath: String, desiredLanguages: [String], disableLocalization: Bool = false) {
+    public static func initialize(
+        directoryPath: String,
+        desiredLanguages: [String],
+        disableLocalization: Bool = false
+    ) {
+        
         let translationManager = TranslationManager(
             directoryPath: directoryPath,
             desiredLangaugeCodes: desiredLanguages
@@ -21,7 +26,6 @@ public final class SL {
                     print("[SL LOG] Localization complete")
                 }
             }
-            
         }
     }
     
