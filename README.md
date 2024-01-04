@@ -42,7 +42,8 @@ Localization is time-consuming so I made a package to automate the task.
 // 'fr' is the French Language Code
 SL.initialize(
     directoryPath: "/Users/photos/Desktop/Localization/SwiftLingoTest/SwiftLingoTest/Localization",
-    desiredLanguages: ["en", fr"]
+    desiredLanguages: ["en", fr"],
+    openAPIKey: "your_API_KEY"
 )
 ```
 ### Watch as files auto-populate once logs are complete
