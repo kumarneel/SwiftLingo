@@ -17,15 +17,16 @@ internal final class TranslationManager: TranslationManagerProtocol {
     
     private let fileManager = FileManager.default
     private let fileReader = FileReader()
-    private let translater = Translater()
         
     private let directoryPath: String
     private let primaryLanguage = "en"
     private let desiredLangaugeCodes: [String]
+    private let openAPIKey: String
     
-    init(directoryPath: String, desiredLangaugeCodes: [String]) {
+    init(directoryPath: String, desiredLangaugeCodes: [String], openAPIKey: String) {
         self.directoryPath = directoryPath
         self.desiredLangaugeCodes = desiredLangaugeCodes
+        self.openAPIKey = openAPIKey
     }
 
     func openFile(completion: @escaping(_ primaryLanguageData: [String: String]) -> Void) {
@@ -56,7 +57,7 @@ internal final class TranslationManager: TranslationManagerProtocol {
             if desiredLangaugeCode == primaryLanguage {
                 continue
             }
-            translater.generateNewLanguageFileString(primaryLanguageData: localizationData, languageCode: desiredLangaugeCode) { fileString in
+            Translater(openAPIKey: openAPIKey).generateNewLanguageFileString(primaryLanguageData: localizationData, languageCode: desiredLangaugeCode) { fileString in
                 fileStringMap[desiredLangaugeCode] = fileString
                 self.writeToFile(writeText: fileString, langCode: desiredLangaugeCode)
                 if fileStringMap.count == self.desiredLangaugeCodes.count {

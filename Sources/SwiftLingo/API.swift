@@ -9,6 +9,12 @@ import Foundation
 
 
 class API {
+    
+    let openAPIKey: String
+    
+    init(openAPIKey: String) {
+        self.openAPIKey = openAPIKey
+    }
 
     func makeAPIRequest(
         _ primaryLanguageData: [String: String],
@@ -23,7 +29,7 @@ class API {
         var request = URLRequest(url: apiUrl)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.addValue("Bearer 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", forHTTPHeaderField: "Authorization")
+        request.addValue("Bearer \(openAPIKey)", forHTTPHeaderField: "Authorization")
 
         // Set the request body
         let requestBody: [String: Any] = [

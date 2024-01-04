@@ -11,12 +11,14 @@ public final class SL {
     public static func initialize(
         directoryPath: String,
         desiredLanguages: [String],
+        openAPIKey: String,
         disableLocalization: Bool = false
     ) {
         
         let translationManager = TranslationManager(
             directoryPath: directoryPath,
-            desiredLangaugeCodes: desiredLanguages
+            desiredLangaugeCodes: desiredLanguages,
+            openAPIKey: openAPIKey
         )
         
         translationManager.openFile { primaryLanguageData in

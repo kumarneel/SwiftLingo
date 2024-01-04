@@ -9,7 +9,8 @@ final class SwiftLingoTests: XCTestCase {
     func testInitialize() {
         let translationManager = TranslationManager(
             directoryPath: directoryPath,
-            desiredLangaugeCodes: desiredLangaugeCodes
+            desiredLangaugeCodes: desiredLangaugeCodes,
+            openAPIKey: ""
         )
         
         let expectation = XCTestExpectation()
