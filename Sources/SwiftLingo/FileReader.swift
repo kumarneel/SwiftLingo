@@ -46,7 +46,7 @@ internal class FileReader: FilerReaderProtocol {
     
     func readStringCatalogDictionary(input: String) -> [String: String] {
         var localizationData = [String: String]()
-        
+        // TASK: clean up logic
         if let dict = convertToDictionary(text: input) {
             // outer layer
             if let stringsDict = dict["strings"] as? [String: Any] {
@@ -58,6 +58,7 @@ internal class FileReader: FilerReaderProtocol {
                         if let localizationDict = valueDict["localizations"] as? [String: Any] {
                             // primary language layer
                             if let englishTranslationDict = localizationDict["en"] as? [String: Any] {
+                                // srting value unit layer
                                 if let stringUnitDict = englishTranslationDict["stringUnit"] as? [String: Any] {
                                     let value = stringUnitDict["value"] as? String ?? ""
                                     localizationData[key] = value

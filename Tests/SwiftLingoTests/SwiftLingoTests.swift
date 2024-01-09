@@ -37,9 +37,27 @@ final class SwiftLingoTests: XCTestCase {
         let expectation = XCTestExpectation()
         
         translationManager.openFile { primaryLanguageData in
-            print("primary language data: ", primaryLanguageData)
             expectation.fulfill()
         }
         wait(for: [expectation], timeout: 5)
+    }
+    
+    func testCatalogWriter() {
+        let directoryPath = "/Users/photos/Desktop/RE/TestCatalogs/TestCatalogs/Localization"
+        let translationManager = TranslationManager(
+            directoryPath: directoryPath,
+            desiredLangaugeCodes: desiredLangaugeCodes,
+            openAPIKey: "",
+            isLegacy: false
+        )
+        let expectation = XCTestExpectation()
+        
+        translationManager.openFile { primaryLanguageData in
+            translationManager.createLanguageFiles(localizationData: primaryLanguageData) { languageStringMaps in
+                expectation.fulfill()
+            }
+        }
+        wait(for: [expectation], timeout: 5)
+        
     }
 }

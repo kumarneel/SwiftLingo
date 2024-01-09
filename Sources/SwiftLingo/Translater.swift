@@ -8,11 +8,12 @@
 import Foundation
 
 internal protocol TranslaterProtocol {
+    func generateNewLanguageArray(primaryLanguageData: [String: String], languageCode: String, completion: @escaping(_ localizedData: [String: String]) -> Void)
     func generateNewLanguageFileString(primaryLanguageData: [String: String], languageCode: String, completion: @escaping(_ fileString: String) -> Void)
 }
 
 internal final class Translater: TranslaterProtocol {
-    
+        
     let openAPIKey: String
     
     init(openAPIKey: String) {
@@ -35,5 +36,9 @@ internal final class Translater: TranslaterProtocol {
             }
             completion(generatedString)
         }
+    }
+    
+    func generateNewLanguageArray(primaryLanguageData: [String : String], languageCode: String, completion: @escaping ([String : String]) -> Void) {
+        API(openAPIKey: openAPIKey).makeAPIRequest(primaryLanguageData, languageCode, completion: completion)
     }
 }
