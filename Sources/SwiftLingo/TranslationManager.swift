@@ -128,9 +128,9 @@ internal final class TranslationManager: TranslationManagerProtocol {
         do {
             if !fileManager.fileExists(atPath: filePath.path) {
                 // throw large fatal error, file does not exist for code
-                fatalError("[SL ERROR]: Localization file not found")
+                fatalError("[SL ERROR]: Localization File does not exist")
             }
-            
+            // TASK: write to file with new localizations
 //            try writeText.write(to: filePath, atomically: true, encoding: String.Encoding.utf8)
             print("[SL LOG]: ", "wrote to file - ", langCode)
         } catch let error {
