@@ -22,16 +22,23 @@ internal final class TranslationManager: TranslationManagerProtocol {
     private let primaryLanguage = "en"
     private let desiredLangaugeCodes: [String]
     private let openAPIKey: String
+    private let isLegacy: Bool
     
-    init(directoryPath: String, desiredLangaugeCodes: [String], openAPIKey: String) {
+    init(directoryPath: String, desiredLangaugeCodes: [String], openAPIKey: String, isLegacy: Bool) {
         self.directoryPath = directoryPath
         self.desiredLangaugeCodes = desiredLangaugeCodes
         self.openAPIKey = openAPIKey
+        self.isLegacy = isLegacy
     }
 
     func openFile(completion: @escaping(_ primaryLanguageData: [String: String]) -> Void) {
         let desiredLanguage = "en"
-        let pathWithDesiredLanguage = directoryPath + "/\(desiredLanguage).lproj/Localizable.strings"
+        var pathWithDesiredLanguage = ""
+        if isLegacy {
+            pathWithDesiredLanguage = directoryPath + "/\(desiredLanguage).lproj/Localizable.strings"
+        } else {
+            pathWithDesiredLanguage = directoryPath + "/Localizable.xcstrings"
+        }
         
         do {
             if !fileManager.fileExists(atPath: pathWithDesiredLanguage) {
@@ -39,7 +46,7 @@ internal final class TranslationManager: TranslationManagerProtocol {
             } else {
                 let fileContents = try String(contentsOfFile: pathWithDesiredLanguage, encoding: .utf8)
                 // go through contents and create an array of files
-                let dictionary = fileReader.mapOutputToReadableDictionary(input: fileContents)
+                let dictionary = fileReader.mapOutputToReadableDictionary(isLegacy: isLegacy, input: fileContents)
                 completion(dictionary)
                
             }
@@ -70,7 +77,7 @@ internal final class TranslationManager: TranslationManagerProtocol {
     internal func writeToFile(writeText: String,
                              langCode: String) {
         
-        // TODO: abstract this file write function
+        // TASK: abstract this file write function
         let fileManager = FileManager.default
 
         let directory = URL(fileURLWithPath: directoryPath)

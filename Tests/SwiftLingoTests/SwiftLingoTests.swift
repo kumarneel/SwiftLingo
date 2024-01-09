@@ -3,14 +3,15 @@ import XCTest
 
 final class SwiftLingoTests: XCTestCase {
     
-    private let directoryPath: String = "/Users/photos/Desktop/Localization/TestLocal/TestLocal/Local"
     private let desiredLangaugeCodes = ["en", "de", "es", "fr"]
     
     func testInitialize() {
+        let directoryPath: String = "/Users/photos/Desktop/Localization/TestLocal/TestLocal/Local"
         let translationManager = TranslationManager(
             directoryPath: directoryPath,
             desiredLangaugeCodes: desiredLangaugeCodes,
-            openAPIKey: ""
+            openAPIKey: "",
+            isLegacy: true
         )
         
         let expectation = XCTestExpectation()
@@ -23,5 +24,22 @@ final class SwiftLingoTests: XCTestCase {
         }
         
         wait(for: [expectation], timeout: 30)
+    }
+    
+    func testCatalogReader() {
+        let directoryPath = "/Users/photos/Desktop/RE/TestCatalogs/TestCatalogs/Localization"
+        let translationManager = TranslationManager(
+            directoryPath: directoryPath,
+            desiredLangaugeCodes: desiredLangaugeCodes,
+            openAPIKey: "",
+            isLegacy: false
+        )
+        let expectation = XCTestExpectation()
+        
+        translationManager.openFile { primaryLanguageData in
+            print("primary language data: ", primaryLanguageData)
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 5)
     }
 }

@@ -8,7 +8,7 @@
 import Foundation
 
 internal protocol FilerReaderProtocol {
-    func mapOutputToReadableDictionary(input: String) -> [String: String]
+    func mapOutputToReadableDictionary(isLegacy: Bool, input: String) -> [String: String]
 }
 
 internal class FileReader: FilerReaderProtocol {
@@ -16,8 +16,15 @@ internal class FileReader: FilerReaderProtocol {
     // Regular expression pattern to match key-value pairs
     private let pattern = "\"([^\"]+)\"\\s*=\\s*\"([^\"]+)\";"
     
-    func mapOutputToReadableDictionary(input: String) -> [String : String] {
-        
+    func mapOutputToReadableDictionary(isLegacy: Bool, input: String) -> [String : String] {
+        if isLegacy {
+            return readLegacyStringDictionary(input: input)
+        } else {
+            return readStringCatalogDictionary(input: input)
+        }
+    }
+    
+    func readLegacyStringDictionary(input: String) -> [String: String] {
         var localizationData = [String: String]()
         do {
             let regex = try NSRegularExpression(pattern: pattern, options: [])
@@ -35,5 +42,47 @@ internal class FileReader: FilerReaderProtocol {
             print("Error creating regular expression: \(error)")
         }
         return localizationData
+    }
+    
+    func readStringCatalogDictionary(input: String) -> [String: String] {
+        var localizationData = [String: String]()
+        
+        if let dict = convertToDictionary(text: input) {
+            // outer layer
+            if let stringsDict = dict["strings"] as? [String: Any] {
+                // key layer
+                for key in stringsDict.keys {
+                    // language key layer
+                    if let valueDict = stringsDict[key] as? [String: Any] {
+                        // localization type layer
+                        if let localizationDict = valueDict["localizations"] as? [String: Any] {
+                            // primary language layer
+                            if let englishTranslationDict = localizationDict["en"] as? [String: Any] {
+                                if let stringUnitDict = englishTranslationDict["stringUnit"] as? [String: Any] {
+                                    let value = stringUnitDict["value"] as? String ?? ""
+                                    localizationData[key] = value
+                                }
+                            }
+                        }
+                        if valueDict["localizations"] == nil {
+                            print("[SL LOG]: Key {\(key)} missing primary language translation")
+                        }
+                    }
+                }
+            }
+        }
+
+        return localizationData
+    }
+    
+    func convertToDictionary(text: String) -> [String: Any]? {
+        if let data = text.data(using: .utf8) {
+            do {
+                return try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
+        return nil
     }
 }
