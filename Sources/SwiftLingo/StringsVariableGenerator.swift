@@ -33,7 +33,7 @@ internal final class StringsVariableGenerator: StringsVariableGeneratorProtocol 
         do {
             if !fileManager.fileExists(atPath: filePath.path) {
                 // throw large fatal error, file does not exist for code
-                fileManager.createFile(atPath: filePath.path, contents: nil, attributes: nil)
+                fatalError("[SL ERROR]: LocalizableStrings.swift does not exist, please follow README")
             }
             try writeText.write(to: filePath, atomically: true, encoding: String.Encoding.utf8)
             print("[SL LOG]: successfully generated new LocalizableStrings")

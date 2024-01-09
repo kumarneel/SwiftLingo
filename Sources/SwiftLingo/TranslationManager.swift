@@ -24,6 +24,10 @@ internal final class TranslationManager: TranslationManagerProtocol {
     private let openAPIKey: String
     private let isLegacy: Bool
     
+    
+    // String catalog file contents
+    private var fileContents: String?
+    
     init(directoryPath: String, desiredLangaugeCodes: [String], openAPIKey: String, isLegacy: Bool) {
         self.directoryPath = directoryPath
         self.desiredLangaugeCodes = desiredLangaugeCodes
@@ -45,6 +49,7 @@ internal final class TranslationManager: TranslationManagerProtocol {
                 fatalError("[SL ERROR]: Localization File does not exist")
             } else {
                 let fileContents = try String(contentsOfFile: pathWithDesiredLanguage, encoding: .utf8)
+                self.fileContents = fileContents
                 // go through contents and create an array of files
                 let dictionary = fileReader.mapOutputToReadableDictionary(isLegacy: isLegacy, input: fileContents)
                 completion(dictionary)
@@ -86,7 +91,6 @@ internal final class TranslationManager: TranslationManagerProtocol {
                     
                     fileStringMap[desiredLangaugeCode] = desiredLangaugeCode
                     
-                    print("localized data: ", localizedData)
                     self.updateCatalogFile(langCode: desiredLangaugeCode, localizedData: localizedData)
                     // Notify we are done translating
                     if fileStringMap.count == self.desiredLangaugeCodes.count {
@@ -120,6 +124,7 @@ internal final class TranslationManager: TranslationManagerProtocol {
     }
     
     internal func updateCatalogFile(langCode: String, localizedData: [String: String]) {
+
         let fileManager = FileManager.default
 
         let directory = URL(fileURLWithPath: directoryPath)
@@ -131,13 +136,15 @@ internal final class TranslationManager: TranslationManagerProtocol {
                 fatalError("[SL ERROR]: Localization File does not exist")
             }
             // TASK: write to file with new localizations
-//            try writeText.write(to: filePath, atomically: true, encoding: String.Encoding.utf8)
+            var writeText = fileReader.createWriteStringForStringCatalog(input: fileContents ?? "", localizationData: localizedData, langCode: langCode)
+            try writeText.write(to: filePath, atomically: true, encoding: String.Encoding.utf8)
+            self.fileContents = writeText
             print("[SL LOG]: ", "wrote to file - ", langCode)
         } catch let error {
             print("[SL ERROR]: ", error)
         }
     }
-    
+        
     internal func generateStringsVariables(primaryLanguageData: [String: String]) {
         let stringsVariableGenerator = StringsVariableGenerator(
             localizationDirectoryPath: directoryPath,

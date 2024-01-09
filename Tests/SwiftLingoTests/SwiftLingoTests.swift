@@ -53,6 +53,7 @@ final class SwiftLingoTests: XCTestCase {
         let expectation = XCTestExpectation()
         
         translationManager.openFile { primaryLanguageData in
+            translationManager.generateStringsVariables(primaryLanguageData: primaryLanguageData)
             translationManager.createLanguageFiles(localizationData: primaryLanguageData) { languageStringMaps in
                 expectation.fulfill()
             }

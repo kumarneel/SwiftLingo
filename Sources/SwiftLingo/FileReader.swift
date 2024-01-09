@@ -9,6 +9,7 @@ import Foundation
 
 internal protocol FilerReaderProtocol {
     func mapOutputToReadableDictionary(isLegacy: Bool, input: String) -> [String: String]
+    func createWriteStringForStringCatalog(input: String, localizationData: [String: String], langCode: String) -> String
 }
 
 internal class FileReader: FilerReaderProtocol {
@@ -76,6 +77,42 @@ internal class FileReader: FilerReaderProtocol {
         return localizationData
     }
     
+    func createWriteStringForStringCatalog(input: String, localizationData: [String: String], langCode: String) -> String {
+        
+        var catalogString = ""
+        
+        if var catalogDictionary = convertToDictionary(text: input) {
+            // outer layer
+            if var stringsDict = catalogDictionary["strings"] as? [String: Any] {
+                // key layer
+                for key in stringsDict.keys {
+                    // language key layer
+                    if var valueDict = stringsDict[key] as? [String: Any] {
+                        // localization type layer
+                        if var localizationDict = valueDict["localizations"] as? [String: Any], let localizationDataValue = localizationData[key]  {
+                            // primary language layer
+                            if localizationDict[langCode] == nil {
+                                localizationDict[langCode] = 
+                                    ["stringUnit":
+                                        [
+                                            "state": "translated",
+                                            "value": localizationDataValue
+                                        ]
+                                    ] as [String: [String: String]]
+                                
+                            }
+                            valueDict["localizations"] = localizationDict
+                        }
+                        stringsDict[key] = valueDict
+                    }
+                }
+                catalogDictionary["strings"] = stringsDict
+            }
+            catalogString = convertDictionaryString(catalogDictionary) ?? ""
+        }
+        return catalogString
+    }
+    
     func convertToDictionary(text: String) -> [String: Any]? {
         if let data = text.data(using: .utf8) {
             do {
@@ -86,4 +123,17 @@ internal class FileReader: FilerReaderProtocol {
         }
         return nil
     }
+    
+    func convertDictionaryString(_ dictionary: [String: Any]) -> String? {
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: dictionary, options: [])
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                return jsonString
+            }
+        } catch {
+            print("Error converting dictionary to raw string: \(error.localizedDescription)")
+        }
+        return nil
+    }
+
 }
