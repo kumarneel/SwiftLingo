@@ -74,9 +74,7 @@ internal final class TranslationManager: TranslationManagerProtocol {
             }
             // TASK: clean up
             if isLegacy {
-                tranlater.generateNewLanguageFileString(primaryLanguageData: localizationData, languageCode: desiredLangaugeCode) { [weak self] fileString in
-                    guard let self else { return }
-                    
+                tranlater.generateNewLanguageFileString(primaryLanguageData: localizationData, languageCode: desiredLangaugeCode) { fileString in
                     fileStringMap[desiredLangaugeCode] = fileString
                     
                     self.writeToFile(writeText: fileString, langCode: desiredLangaugeCode)
@@ -86,8 +84,7 @@ internal final class TranslationManager: TranslationManagerProtocol {
                     }
                 }
             } else {
-                tranlater.generateNewLanguageArray(primaryLanguageData: localizationData, languageCode: desiredLangaugeCode) { [weak self] localizedData in
-                    guard let self else { return }
+                tranlater.generateNewLanguageArray(primaryLanguageData: localizationData, languageCode: desiredLangaugeCode) { localizedData in
                     
                     fileStringMap[desiredLangaugeCode] = desiredLangaugeCode
                     
