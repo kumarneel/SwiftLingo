@@ -133,7 +133,7 @@ internal final class TranslationManager: TranslationManagerProtocol {
                 fatalError("[SL ERROR]: Localization File does not exist")
             }
             // TASK: write to file with new localizations
-            var writeText = fileReader.createWriteStringForStringCatalog(input: fileContents ?? "", localizationData: localizedData, langCode: langCode)
+            let writeText = fileReader.createWriteStringForStringCatalog(input: fileContents ?? "", localizationData: localizedData, langCode: langCode)
             try writeText.write(to: filePath, atomically: true, encoding: String.Encoding.utf8)
             self.fileContents = writeText
             print("[SL LOG]: ", "wrote to file - ", langCode)
